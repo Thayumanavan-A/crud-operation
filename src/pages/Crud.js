@@ -16,7 +16,13 @@ const CRUD = () => {
     const { userId, id, title, body } = formData;
 
     const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
+        setFormData(prevFormData => {
+            return { 
+                    ...prevFormData, 
+                    [e.target.name]: e.target.value 
+                   }
+                }
+            );
     };
 
     const handleSubmit = (e) => {
@@ -24,9 +30,10 @@ const CRUD = () => {
         if (userId && id && title && body) {
             axios.post('https://jsonplaceholder.typicode.com/posts', formData)
                 .then(res => {
-                    setData([...data, res.data]);
+                    setData(prevSetData => {
+                        return [...data, res.data]
+                    });
                     setFormData({ userId: "", id: "", title: "", body: "" });
-
                 })
                 .catch(err => console.log(err))
 
@@ -41,16 +48,17 @@ const CRUD = () => {
                     setRefresh(refresh + 1)
                 })
                 .catch(err => console.log(err))
+            setEditID()
 
         }
     };
 
     const handleDelete = (deleteID) => {
         axios.delete(`https://jsonplaceholder.typicode.com/posts/${deleteID}`)
-        .then(res => {
-           console.log('DELETD RECORD::::', res)
+        // .then(res => {
+        //    console.log('DELETD RECORD::::', res)
 
-        })
+        // })
         .catch(err => console.log(err))
     };
 
@@ -71,6 +79,7 @@ const CRUD = () => {
             .catch(err => console.log(err))
         // console.log(data);
     }, [refresh]);
+
 
     return (
         <div className="container">
@@ -130,14 +139,16 @@ const CRUD = () => {
                             ></textarea>
                         </div>
 
-                        <button type="submit" className="btn btn-primary">
+                        {!editID ? <button type="submit" className="btn btn-primary mr-2">
                             Submit
-                        </button>
-                        <button type="submit" className="btn btn-primary" onClick={() => {
+                        </button> : 
+                         <button type="submit" className="btn btn-primary" onClick={() => {
                             handleUpdate()
                         }}>
                             Update
                         </button>
+                        } 
+                       
                     </form>
 
                     <hr />
@@ -160,13 +171,13 @@ const CRUD = () => {
                                     <td>{item.title}</td>
                                     <td>{item.body}</td>
                                     <td>
-                                        <button className="btn btn-warning" onClick={() => {
+                                        <button className="btn btn-warning mb-1" onClick={() => {
                                             handleEdit(item.id)
                                             setEditID(item.id)
                                         }}>
                                             Edit
-                                        </button>{" "}
-                                        <button className="btn btn-danger" onClick={() => handleDelete(item.id)}>
+                                        </button>
+                                        <button className="btn btn-danger mt-1" onClick={() => handleDelete(item.id)}>
                                             Delete
                                         </button>
                                     </td>
